@@ -1,0 +1,201 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Theme taken from provided reference (teal-on-dark). */
+    --app-bg: #060d16;
+    --surface-1: rgba(255, 255, 255, 0.06);
+    --surface-2: rgba(255, 255, 255, 0.09);
+    --text-1: rgba(255, 255, 255, 0.92);
+    --text-2: rgba(255, 255, 255, 0.72);
+    --muted: rgba(255, 255, 255, 0.54);
+
+    --brand: #18c6a6;
+    --brand-strong: #12ad92;
+    --brand-ink: #042a24;
+    --brand-soft: rgba(24, 198, 166, 0.14);
+    --brand-soft-2: rgba(24, 198, 166, 0.2);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body,
+  #root {
+    margin: 0;
+    min-height: 100%;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html.practice-locked,
+  html.practice-locked body {
+    height: 100%;
+    max-height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  html.practice-locked #root {
+    height: 100%;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+
+  * {
+    -webkit-touch-callout: none;
+  }
+
+  button {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .hi-text {
+    font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .bg-app {
+    background-color: var(--app-bg);
+    background-image: radial-gradient(
+      circle at 20% -10%,
+      rgba(24, 198, 166, 0.22) 0%,
+      transparent 42%
+    );
+  }
+
+  .card {
+    /* Reference UI has soft surfaces without hard outlines. */
+    border: 0;
+    background: var(--surface-1);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+  }
+
+  .mode-card {
+    @apply card p-5 transition active:scale-[0.99] hover:shadow-md;
+  }
+
+  .lesson-card {
+    @apply card p-4 transition active:scale-[0.99];
+  }
+
+  .btn-primary {
+    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-strong) 100%);
+    color: #06221d;
+    box-shadow: 0 10px 28px rgba(24, 198, 166, 0.18);
+    border: 0;
+    border-radius: 14px;
+    padding: 0.65rem 1rem;
+    font-weight: 700;
+    transition: transform 120ms ease, filter 120ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.03);
+  }
+
+  .btn-secondary {
+    background: var(--surface-2);
+    color: var(--text-1);
+    border: 0;
+    border-radius: 14px;
+    padding: 0.65rem 1rem;
+    font-weight: 700;
+    transition: transform 120ms ease, filter 120ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .btn-nav {
+    @apply inline-flex items-center justify-center gap-1 rounded-xl border-0 bg-white/10 px-4 py-3 text-sm font-medium text-white/85 transition enabled:hover:bg-white/15 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .text-brand {
+    color: var(--brand);
+  }
+
+  .bg-brand-soft {
+    background: var(--brand-soft);
+  }
+
+  .bg-brand-soft-2 {
+    background: var(--brand-soft-2);
+  }
+
+  .muted {
+    color: var(--text-2);
+  }
+
+  .mic-btn {
+    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-strong) 100%);
+    box-shadow: 0 10px 28px rgba(24, 198, 166, 0.25);
+  }
+
+  .mic-btn-active {
+    animation: mic-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes mic-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(24, 198, 166, 0.45);
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba(24, 198, 166, 0);
+    }
+  }
+
+  .chat-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(100 116 139 / 0.35) transparent;
+  }
+
+  .chat-scroll::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .chat-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .chat-scroll::-webkit-scrollbar-thumb {
+    background: rgb(100 116 139 / 0.35);
+    border-radius: 999px;
+  }
+
+  .dark .chat-scroll {
+    scrollbar-color: rgb(148 163 184 / 0.25) transparent;
+  }
+
+  .dark .chat-scroll::-webkit-scrollbar-thumb {
+    background: rgb(148 163 184 / 0.25);
+  }
+}
