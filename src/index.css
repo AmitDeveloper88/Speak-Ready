@@ -4,19 +4,22 @@
 
 @layer base {
   :root {
-    /* Theme taken from provided reference (teal-on-dark). */
-    --app-bg: #060d16;
-    --surface-1: rgba(255, 255, 255, 0.06);
-    --surface-2: rgba(255, 255, 255, 0.09);
-    --text-1: rgba(255, 255, 255, 0.92);
-    --text-2: rgba(255, 255, 255, 0.72);
-    --muted: rgba(255, 255, 255, 0.54);
+    --app-bg: #0b0f14;
+    --surface-1: rgba(255, 255, 255, 0.05);
+    --surface-2: rgba(255, 255, 255, 0.08);
+    --text-1: rgba(255, 255, 255, 0.95);
+    --text-2: rgba(255, 255, 255, 0.68);
+    --muted: rgba(255, 255, 255, 0.48);
 
-    --brand: #18c6a6;
-    --brand-strong: #12ad92;
+    --brand: #00c896;
+    --brand-strong: #00a67c;
     --brand-ink: #042a24;
-    --brand-soft: rgba(24, 198, 166, 0.14);
-    --brand-soft-2: rgba(24, 198, 166, 0.2);
+    --brand-soft: rgba(0, 200, 150, 0.14);
+    --brand-soft-2: rgba(0, 200, 150, 0.22);
+    --brand-bubble: #123c32;
+    --partner-bubble: #1a2433;
+    --partner-label: #9b8afb;
+    --chat-panel: #141a22;
   }
 
   html {
@@ -70,23 +73,21 @@
   .bg-app {
     background-color: var(--app-bg);
     background-image: radial-gradient(
-      circle at 20% -10%,
-      rgba(24, 198, 166, 0.22) 0%,
-      transparent 42%
+      circle at 50% -20%,
+      rgba(0, 200, 150, 0.12) 0%,
+      transparent 50%
     );
   }
 
   .card {
-    /* Reference UI has soft surfaces without hard outlines. */
     border: 0;
     background: var(--surface-1);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(10px);
-    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    border-radius: 16px;
   }
 
   .mode-card {
-    @apply card p-5 transition active:scale-[0.99] hover:shadow-md;
+    @apply card p-5 transition active:scale-[0.99];
   }
 
   .lesson-card {
@@ -94,13 +95,14 @@
   }
 
   .btn-primary {
-    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-strong) 100%);
-    color: #06221d;
-    box-shadow: 0 10px 28px rgba(24, 198, 166, 0.18);
+    background: var(--brand);
+    color: var(--brand-ink);
+    box-shadow: 0 4px 20px rgba(0, 200, 150, 0.35);
     border: 0;
-    border-radius: 14px;
-    padding: 0.65rem 1rem;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
     font-weight: 700;
+    font-size: 0.9rem;
     transition: transform 120ms ease, filter 120ms ease;
     display: inline-flex;
     align-items: center;
@@ -114,17 +116,17 @@
   }
 
   .btn-primary:hover {
-    filter: brightness(1.03);
+    filter: brightness(1.05);
   }
 
   .btn-secondary {
     background: var(--surface-2);
     color: var(--text-1);
     border: 0;
-    border-radius: 14px;
+    border-radius: 12px;
     padding: 0.65rem 1rem;
-    font-weight: 700;
-    transition: transform 120ms ease, filter 120ms ease;
+    font-weight: 600;
+    transition: transform 120ms ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -132,12 +134,32 @@
     width: 100%;
   }
 
-  .btn-nav {
-    @apply inline-flex items-center justify-center gap-1 rounded-xl border-0 bg-white/10 px-4 py-3 text-sm font-medium text-white/85 transition enabled:hover:bg-white/15 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40;
+  .btn-outline-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border: 1px solid var(--brand);
+    color: var(--brand);
+    background: transparent;
+    border-radius: 999px;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background 120ms ease, active 120ms ease;
+  }
+
+  .btn-outline-brand:active {
+    transform: scale(0.97);
+    background: var(--brand-soft);
   }
 
   .text-brand {
     color: var(--brand);
+  }
+
+  .bg-brand {
+    background-color: var(--brand);
   }
 
   .bg-brand-soft {
@@ -148,13 +170,92 @@
     background: var(--brand-soft-2);
   }
 
-  .muted {
-    color: var(--text-2);
+  .speed-pill {
+    display: flex;
+    height: 2.5rem;
+    min-width: 2.75rem;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.65);
+    background: transparent;
+    transition: background 120ms ease, color 120ms ease;
+  }
+
+  .speed-pill-active {
+    background-color: var(--brand);
+    color: var(--brand-ink);
+  }
+
+  .text-partner {
+    color: var(--partner-label);
+  }
+
+  .chat-bubble-partner {
+    background: var(--partner-bubble);
+    border-radius: 16px;
+    padding: 0.85rem 1rem;
+  }
+
+  .chat-bubble-user {
+    background: var(--brand-bubble);
+    border-radius: 16px;
+    padding: 0.85rem 1rem;
+  }
+
+  /* Ring while that line’s audio is playing — matches side accent */
+  .chat-bubble-highlight-active-user {
+    box-shadow: 0 0 0 1px rgba(0, 200, 150, 0.55);
+  }
+
+  .chat-bubble-highlight-active-partner {
+    box-shadow: 0 0 0 1px rgba(155, 138, 251, 0.55);
+  }
+
+  .chat-bubble-selected-user {
+    box-shadow: 0 0 0 1px rgba(0, 200, 150, 0.35);
+  }
+
+  .chat-bubble-selected-partner {
+    box-shadow: 0 0 0 1px rgba(155, 138, 251, 0.35);
+  }
+
+  .other-ways-box {
+    margin-top: 0.35rem;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--chat-panel);
+  }
+
+  .other-ways-toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border: 0;
+    background: transparent;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .other-ways-toggle-partner {
+    color: var(--partner-label);
+  }
+
+  .other-ways-toggle-user {
+    color: var(--brand);
   }
 
   .mic-btn {
-    background: linear-gradient(180deg, var(--brand) 0%, var(--brand-strong) 100%);
-    box-shadow: 0 10px 28px rgba(24, 198, 166, 0.25);
+    background: var(--brand);
+    box-shadow: 0 8px 28px rgba(0, 200, 150, 0.45);
   }
 
   .mic-btn-active {
@@ -164,38 +265,40 @@
   @keyframes mic-pulse {
     0%,
     100% {
-      box-shadow: 0 0 0 0 rgba(24, 198, 166, 0.45);
+      box-shadow: 0 0 0 0 rgba(0, 200, 150, 0.5);
     }
     50% {
-      box-shadow: 0 0 0 10px rgba(24, 198, 166, 0);
+      box-shadow: 0 0 0 12px rgba(0, 200, 150, 0);
     }
+  }
+
+  .practice-progress-track {
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  .practice-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--brand);
+    transition: width 300ms ease;
   }
 
   .chat-scroll {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     scrollbar-width: thin;
-    scrollbar-color: rgb(100 116 139 / 0.35) transparent;
+    scrollbar-color: rgb(0 200 150 / 0.25) transparent;
   }
 
   .chat-scroll::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  .chat-scroll::-webkit-scrollbar-track {
-    background: transparent;
+    width: 4px;
   }
 
   .chat-scroll::-webkit-scrollbar-thumb {
-    background: rgb(100 116 139 / 0.35);
+    background: rgb(0 200 150 / 0.25);
     border-radius: 999px;
-  }
-
-  .dark .chat-scroll {
-    scrollbar-color: rgb(148 163 184 / 0.25) transparent;
-  }
-
-  .dark .chat-scroll::-webkit-scrollbar-thumb {
-    background: rgb(148 163 184 / 0.25);
   }
 }

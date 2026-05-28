@@ -19,6 +19,7 @@ export function getLessonConversation(lesson) {
           speaker: turn.speaker || 'Speaker',
           text: turn.text,
           hi: turn.hi || turn.meaning || '',
+          alternatives: turn.alternatives || [],
         }
   );
 }

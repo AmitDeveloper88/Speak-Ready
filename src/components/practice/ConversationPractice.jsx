@@ -6,14 +6,11 @@ import {
   isUserSpeaker,
 } from '../../utils/lessonContent';
 import { stopAllSpeech } from '../../utils/stopAllSpeech';
+import ChatTurnBubble from './ChatTurnBubble';
 import Icon from '../ui/Icon';
 
 const PLAYBACK_SPEEDS = [0.75, 1, 1.25];
 const SPEED_STORAGE_KEY = 'speakready-playback-rate';
-
-function speakerInitial(speaker) {
-  return (speaker || '?').charAt(0).toUpperCase();
-}
 
 function readStoredSpeed() {
   const raw = localStorage.getItem(SPEED_STORAGE_KEY);
@@ -83,7 +80,25 @@ const themes = {
 
 /** @typedef {'idle' | 'playing' | 'paused'} PlaybackState */
 
-export default function ConversationPractice({ lesson, variant = 'shadow' }) {
+function firstUserTurnIndex(turns) {
+  const idx = turns.findIndex((t) => isUserSpeaker(t.speaker));
+  return idx >= 0 ? idx : 0;
+}
+
+function nextUserTurnIndex(turns, fromIndex) {
+  for (let i = fromIndex + 1; i < turns.length; i++) {
+    if (isUserSpeaker(turns[i].speaker)) return i;
+  }
+  return -1;
+}
+
+export default function ConversationPractice({
+  lesson,
+  conversation: conversationProp,
+  variant = 'shadow',
+  showAlternatives = false,
+  autoAdvanceOnSuccess = false,
+}) {
   const theme = themes[variant] || themes.shadow;
   const { speak, speakSequence, pause, resume, stop } = useSpeech();
   const {
@@ -98,12 +113,28 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
     warmup: warmupMic,
   } = useSpeechRecognition();
 
-  const turns = getLessonConversation(lesson);
+  const turns = useMemo(() => {
+    if (conversationProp?.length) {
+      return conversationProp.map((turn) =>
+        typeof turn === 'string'
+          ? { speaker: 'Speaker', text: turn, hi: '', alternatives: [] }
+          : {
+              speaker: turn.speaker || 'Speaker',
+              text: turn.text,
+              hi: turn.hi || '',
+              alternatives: turn.alternatives || [],
+            }
+      );
+    }
+    return lesson ? getLessonConversation(lesson) : [];
+  }, [conversationProp, lesson]);
 
   const [activeIndex, setActiveIndex] = useState(null);
   const [playback, setPlayback] = useState('idle');
   const [playbackRate, setPlaybackRate] = useState(readStoredSpeed);
-  const [speakTargetIndex, setSpeakTargetIndex] = useState(0);
+  const [speakTargetIndex, setSpeakTargetIndex] = useState(() =>
+    firstUserTurnIndex(turns)
+  );
   const [lineFeedback, setLineFeedback] = useState(null);
   const feedbackLineRef = useRef(null);
   const [isCheckingMic, setIsCheckingMic] = useState(false);
@@ -116,6 +147,11 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
     if (!lineFeedback) return;
     feedbackLineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [lineFeedback]);
+
+  useEffect(() => {
+    setSpeakTargetIndex(firstUserTurnIndex(turns));
+    setLineFeedback(null);
+  }, [turns]);
 
   useEffect(() => {
     warmupMic();
@@ -165,15 +201,19 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
     startConversation();
   };
 
-  const handlePlayLine = (idx) => {
+  const handlePlayText = (text, idx = null) => {
     stop();
     setPlayback('idle');
-    setActiveIndex(idx);
-    setSpeakTargetIndex(idx);
-    speak(turns[idx].text, {
+    if (idx != null) setActiveIndex(idx);
+    speak(text, {
       ...speechOpts,
       onEnd: () => setActiveIndex(null),
     });
+  };
+
+  const handlePlayLine = (idx) => {
+    setSpeakTargetIndex(idx);
+    handlePlayText(turns[idx].text, idx);
   };
 
   const handleSelectPracticeLine = (idx) => {
@@ -215,13 +255,21 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
   const onListenResult = useCallback(
     (result) => {
       const expected = turns[speakTargetIndex]?.text;
+      if (autoAdvanceOnSuccess && result.ok) {
+        const next = nextUserTurnIndex(turns, speakTargetIndex);
+        if (next >= 0) {
+          setSpeakTargetIndex(next);
+          setLineFeedback(null);
+          return;
+        }
+      }
       setLineFeedback({
         idx: speakTargetIndex,
         expected,
         ...result,
       });
     },
-    [speakTargetIndex, turns]
+    [autoAdvanceOnSuccess, speakTargetIndex, turns]
   );
 
   const handleMicTap = () => {
@@ -249,13 +297,20 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
 
   const targetTurn =
     speakTargetIndex != null ? turns[speakTargetIndex] : null;
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
-      <div className="flex shrink-0 items-stretch gap-1.5">
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
+      <div
+        className={`grid shrink-0 items-stretch gap-2 ${
+          playback === 'paused'
+            ? 'grid-cols-[minmax(0,1fr)_auto_auto]'
+            : 'grid-cols-[minmax(0,1fr)_auto]'
+        }`}
+      >
         <button
           type="button"
           onClick={handleMainControl}
-          className={`${theme.playBtn} min-w-0 flex-1`}
+          className={`${theme.playBtn} !w-auto min-w-0`}
         >
           {playback === 'playing' ? (
             <>
@@ -276,7 +331,7 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
         </button>
 
         <div
-          className="flex shrink-0 items-center rounded-xl bg-white/6 p-0.5"
+          className="flex w-[8.75rem] shrink-0 items-stretch gap-0.5 rounded-xl bg-white/[0.06] p-0.5"
           role="group"
           aria-label="Playback speed"
         >
@@ -287,11 +342,7 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
                 key={speed}
                 type="button"
                 onClick={() => setPlaybackRate(speed)}
-                className={`rounded-lg px-2.5 py-2 text-xs font-semibold transition ${
-                  active
-                    ? 'bg-brand-soft-2 text-white'
-                    : 'text-white/55 hover:text-white/80'
-                }`}
+                className={`speed-pill ${active ? 'speed-pill-active' : ''}`}
               >
                 {speed}x
               </button>
@@ -303,7 +354,7 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
           <button
             type="button"
             onClick={handleRestart}
-            className={theme.secondaryBtn}
+            className={`${theme.secondaryBtn} !w-auto shrink-0 px-3`}
             aria-label="Restart from beginning"
             title="Start over"
           >
@@ -312,8 +363,8 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
         )}
       </div>
 
-      <div className="chat-scroll card min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-2.5 sm:p-3">
-        <div className="space-y-2">
+      <div className="chat-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto rounded-2xl bg-[var(--chat-panel)]/40 px-2 py-3">
+        <div className="flex flex-col gap-4 pb-2">
           {turns.map((turn, idx) => {
             const isUser = isUserSpeaker(turn.speaker);
             const isActive = activeIndex === idx;
@@ -325,79 +376,19 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
                 ref={isSpeakTarget ? feedbackLineRef : null}
                 className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`w-full max-w-[94%] sm:max-w-[90%] ${
-                    isUser ? 'flex flex-col items-end' : ''
-                  }`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => handlePlayLine(idx)}
-                    className={`w-full rounded-xl px-3 py-2 text-left transition ${
-                      isUser
-                        ? theme.userBubble
-                        : 'rounded-2xl bg-white/6 text-white/90'
-                    } ${
-                      isActive || isSpeakTarget
-                        ? 'brightness-[1.04]'
-                        : 'active:scale-[0.99] hover:brightness-[1.02]'
-                    }`}
-                  >
-                    <div
-                      className={`mb-1 flex items-center gap-1.5 ${
-                        isUser ? 'justify-end' : 'justify-start'
-                      }`}
-                    >
-                      <span
-                        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold sm:h-6 sm:w-6 sm:text-[10px] ${
-                          isUser
-                            ? theme.userAvatar
-                            : 'bg-white/10 text-white/70'
-                        }`}
-                      >
-                        {speakerInitial(turn.speaker)}
-                      </span>
-                      <span
-                        className={`text-[10px] font-semibold uppercase tracking-wide sm:text-[11px] ${
-                          isUser ? theme.userLabel : 'text-white/55'
-                        }`}
-                      >
-                        {turn.speaker}
-                      </span>
-                    </div>
-                    <p
-                      className={`text-[13px] leading-snug sm:text-sm ${
-                        isUser ? 'text-white' : 'text-white/90'
-                      }`}
-                    >
-                      {turn.text}
-                    </p>
-                    {turn.hi && (
-                      <p
-                        className={`hi-text mt-1.5 border-t pt-1.5 text-[13px] leading-snug sm:text-sm ${
-                          isUser
-                            ? `${theme.userHiBorder} ${theme.userHiText}`
-                            : 'border-white/12 text-white/90'
-                        }`}
-                      >
-                        {turn.hi}
-                      </p>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSelectPracticeLine(idx)}
-                    className={`mt-1 text-[10px] font-medium transition ${
-                      isUser ? '' : 'block'
-                    } ${
-                      isSpeakTarget
-                        ? 'text-brand'
-                        : 'text-white/45 hover:text-white/70'
-                    } ${isUser ? 'text-right' : 'text-left'}`}
-                  >
-                    {isSpeakTarget ? '● Practice this line' : 'Practice this line'}
-                  </button>
+                <div className={isUser ? 'flex flex-col items-end' : ''}>
+                  <ChatTurnBubble
+                    turn={turn}
+                    isUser={isUser}
+                    partnerLabel="Person"
+                    userLabel="You"
+                    isActive={isActive}
+                    isSelected={isSpeakTarget}
+                    showAlternatives={showAlternatives}
+                    onSelectPractice={() => handleSelectPracticeLine(idx)}
+                    onPlayLine={() => handlePlayLine(idx)}
+                    onPlayPhrase={(phrase) => handlePlayText(phrase, idx)}
+                  />
                 </div>
               </div>
             );
@@ -405,10 +396,10 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
         </div>
       </div>
 
-      <div className="shrink-0 pt-1">
+      <div className="shrink-0 border-t border-white/8 pt-3">
         {micSupported ? (
           <>
-            <div className="mb-2 min-h-[3.5rem] rounded-xl bg-white/6 px-3 py-2">
+            <div className="mb-3 min-h-[2.75rem] rounded-2xl bg-white/[0.05] px-3 py-2.5">
               {lineFeedback && !isListening && !isCheckingMic ? (
                 <>
                   <LinePracticeFeedback
@@ -423,22 +414,23 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
                     >
                       Try again
                     </button>
-                    {lineFeedback.ok && speakTargetIndex < turns.length - 1 && (
-                      <button
-                        type="button"
-                        onClick={handleNextLine}
-                        className="btn-primary min-w-0 flex-1 py-2 text-xs"
-                      >
-                        Next line →
-                      </button>
-                    )}
+                    {!autoAdvanceOnSuccess &&
+                      lineFeedback.ok &&
+                      speakTargetIndex < turns.length - 1 && (
+                        <button
+                          type="button"
+                          onClick={handleNextLine}
+                          className="btn-primary min-w-0 flex-1 py-2 text-xs"
+                        >
+                          Next line →
+                        </button>
+                      )}
                   </div>
                 </>
               ) : (
                 <>
                   {targetTurn && (
-                    <p className="text-center text-xs text-white/55">
-                      <span className="text-white/40">Target: </span>
+                    <p className="text-center text-[14px] font-medium leading-snug text-white/85">
                       “{targetTurn.text}”
                     </p>
                   )}
@@ -462,7 +454,7 @@ export default function ConversationPractice({ lesson, variant = 'shadow' }) {
                 type="button"
                 disabled={speakTargetIndex == null || isCheckingMic}
                 onClick={handleMicTap}
-                className={`mic-btn flex h-14 w-14 items-center justify-center rounded-full text-[#06221d] shadow-lg transition disabled:opacity-40 ${
+                className={`mic-btn flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full text-[#042a24] shadow-lg transition disabled:opacity-40 ${
                   isListening || isPreparing
                     ? 'mic-btn-active scale-105'
                     : isCheckingMic

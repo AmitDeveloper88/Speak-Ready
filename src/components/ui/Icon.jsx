@@ -69,6 +69,20 @@ const paths = {
       d="M8 10h8M8 14h5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
     />
   ),
+  volume: (
+    <>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M11 5L6 9H3v6h3l5 4V5z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15.54 8.46a5 5 0 010 7.07M18.07 5.93a9 9 0 010 12.14"
+      />
+    </>
+  ),
   mic: (
     <>
       <path

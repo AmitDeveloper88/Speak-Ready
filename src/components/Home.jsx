@@ -1,8 +1,10 @@
-import { lessons } from '../data/lessons';
-import { getLessonItemLabel } from '../utils/lessonContent';
+import {
+  getCatalogTopicCount,
+  situationCatalog,
+} from '../data/situationCatalog';
 
-export default function Home({ onOpenLesson }) {
-  const allLessons = lessons.filter((l) => l.mode === 'shadow');
+export default function Home({ onOpenTopic }) {
+  const totalTopics = getCatalogTopicCount();
 
   return (
     <>
@@ -14,33 +16,44 @@ export default function Home({ onOpenLesson }) {
           SpeakReady
         </h1>
         <p className="mt-2 max-w-xs text-sm leading-relaxed text-white/70">
-          Build fluency with shadowing and real conversations — no login, works
-          offline.
+          Real situations — tap a topic, then practice step by step.
         </p>
       </header>
 
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-white/55">
-        {allLessons.length} conversations
+      <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-white/55">
+        {totalTopics} situations
       </p>
 
-      <div className="space-y-3 pb-6">
-        {allLessons.map((lesson) => (
-          <button
-            key={lesson.id}
-            type="button"
-            onClick={() => onOpenLesson(lesson.id)}
-            className="lesson-card w-full text-left"
-          >
-            <h2 className="font-semibold text-white">{lesson.title}</h2>
-            {lesson.description && (
-              <p className="mt-1 line-clamp-2 text-sm text-white/70">
-                {lesson.description}
-              </p>
-            )}
-            <p className="mt-3 text-xs font-medium text-brand">
-              {getLessonItemLabel(lesson)} →
-            </p>
-          </button>
+      <div className="space-y-6 pb-6">
+        {situationCatalog.map((section) => (
+          <section key={section.id}>
+            <h2 className="mb-2 px-0.5 text-xs font-bold uppercase tracking-wide text-brand">
+              {section.title}
+            </h2>
+            <div className="space-y-2">
+              {section.topics.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => onOpenTopic(t.id)}
+                  className="lesson-card flex w-full items-center gap-3 text-left"
+                >
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/8 text-xs font-bold text-white/70">
+                    {t.number}
+                  </span>
+                  <span className="min-w-0 flex-1 font-semibold text-white">
+                    {t.title}
+                  </span>
+                  {t.situations.length > 0 && (
+                    <span className="shrink-0 rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-semibold text-brand">
+                      {t.situations.length}
+                    </span>
+                  )}
+                  <span className="shrink-0 text-brand">→</span>
+                </button>
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </>
