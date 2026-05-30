@@ -2,71 +2,30 @@
 /** @typedef {{ id: string, number: number, title: string, tagline?: string, situations: SituationItem[] }} CatalogTopic */
 /** @typedef {{ id: string, title: string, topics: CatalogTopic[] }} CatalogSection */
 
-const MEETING_FIRST_TIME_SITUATIONS = [
-  { id: 'saying-hello', number: 1, title: 'Saying Hello' },
-  { id: 'asking-name', number: 2, title: 'Asking Name' },
-  { id: 'introducing-yourself', number: 3, title: 'Introducing Yourself' },
-  {
-    id: 'where-are-you-from',
-    number: 4,
-    title: 'Asking “Where are you from?”',
-  },
-  { id: 'asking-about-work', number: 5, title: 'Asking About Work' },
-  { id: 'asking-about-studies', number: 6, title: 'Asking About Studies' },
-  { id: 'talking-about-hobbies', number: 7, title: 'Talking About Hobbies' },
-  { id: 'meeting-at-office', number: 8, title: 'Meeting at Office' },
-  { id: 'meeting-at-college', number: 9, title: 'Meeting at College' },
-  { id: 'meeting-at-party', number: 10, title: 'Meeting at Party' },
-  {
-    id: 'meeting-friends-friend',
-    number: 11,
-    title: 'Meeting Friend’s Friend',
-  },
-  { id: 'talking-to-neighbor', number: 12, title: 'Talking to Neighbor' },
-  {
-    id: 'first-time-phone-call',
-    number: 13,
-    title: 'First Time Phone Call',
-  },
-  { id: 'first-video-call', number: 14, title: 'First Video Call' },
-  {
-    id: 'talking-to-new-roommate',
-    number: 15,
-    title: 'Talking to New Roommate',
-  },
-  {
-    id: 'meeting-during-travel',
-    number: 16,
-    title: 'Meeting During Travel',
-  },
-  { id: 'starting-small-talk', number: 17, title: 'Starting Small Talk' },
-  {
-    id: 'asking-basic-questions',
-    number: 18,
-    title: 'Asking Basic Questions',
-  },
-  {
-    id: 'ending-conversation',
-    number: 19,
-    title: 'Ending the Conversation',
-  },
-  {
-    id: 'saying-goodbye-politely',
-    number: 20,
-    title: 'Saying Goodbye Politely',
-  },
-];
+/** @param {{ title: string, id?: string }[]} items */
+function situationsFrom(items) {
+  return items.map((item, index) => ({
+    id:
+      item.id ??
+      item.title
+        .toLowerCase()
+        .replace(/['"]/g, '')
+        .replace(/[^a-z0-9]+/gi, '-')
+        .replace(/^-|-$/g, ''),
+    number: index + 1,
+    title: item.title,
+  }));
+}
 
-/** @param {number} n @param {string} title @param {string} id @param {SituationItem[] | null} [situations] */
-function topic(n, title, id, situations = null) {
+let topicNumber = 0;
+
+/** @param {string} title @param {string} id @param {SituationItem[] | null} [situations] */
+function topic(title, id, situations = null) {
+  topicNumber += 1;
   return {
-    number: n,
+    number: topicNumber,
     title,
     id,
-    tagline:
-      id === 'meeting-first-time'
-        ? 'Real first-time meeting situations'
-        : undefined,
     situations: situations ?? [],
   };
 }
@@ -74,135 +33,538 @@ function topic(n, title, id, situations = null) {
 /** @type {CatalogSection[]} */
 export const situationCatalog = [
   {
-    id: 'people',
-    title: 'People & Relationships',
+    id: 'level-1',
+    title: 'Level 1: Starting Conversations',
     topics: [
-      topic(1, 'Meeting Someone First Time', 'meeting-first-time', MEETING_FIRST_TIME_SITUATIONS),
-      topic(2, 'Talking to Friends', 'talking-friends'),
-      topic(3, 'Talking to Family', 'talking-family'),
-      topic(4, 'Meeting After Long Time', 'meeting-after-long-time'),
-      topic(5, 'Talking to Stranger', 'talking-stranger'),
-      topic(6, 'Phone Call Conversation', 'phone-call'),
-      topic(7, 'Video Call Conversation', 'video-call'),
-      topic(8, 'Asking for Help', 'asking-help'),
-      topic(9, 'Giving Help', 'giving-help'),
-      topic(10, 'Asking Questions', 'asking-questions'),
-      topic(11, 'Saying Sorry', 'saying-sorry'),
-      topic(12, 'Thanking Someone', 'thanking-someone'),
-      topic(13, 'Giving Opinion', 'giving-opinion'),
-      topic(14, 'Agreeing & Disagreeing', 'agreeing-disagreeing'),
-      topic(15, 'Making Plans', 'making-plans'),
-      topic(16, 'Cancelling Plans', 'cancelling-plans'),
-      topic(17, 'Inviting Someone', 'inviting-someone'),
-      topic(18, 'Talking About Yourself', 'talking-about-yourself'),
-      topic(19, 'Talking About Your Work', 'talking-about-work'),
-      topic(20, 'Talking About Your Day', 'talking-about-day'),
+      topic(
+        'Greetings',
+        'greetings',
+        situationsFrom([
+          { title: 'Formal Greetings', id: 'formal-greetings' },
+          { title: 'Casual Greetings', id: 'casual-greetings' },
+          { title: 'Greeting on Phone', id: 'greeting-on-phone' },
+          { title: 'Greeting New People', id: 'greeting-new-people' },
+          { title: 'Greeting Groups', id: 'greeting-groups' },
+        ])
+      ),
+      topic(
+        'Introductions',
+        'introductions',
+        situationsFrom([
+          { title: 'Self Introduction', id: 'self-introduction' },
+          { title: 'Professional Introduction', id: 'professional-introduction' },
+          { title: 'Student Introduction', id: 'student-introduction' },
+          { title: 'Short Introduction', id: 'short-introduction' },
+          { title: 'Public Introduction', id: 'public-introduction' },
+        ])
+      ),
+      topic(
+        'Starting Conversations',
+        'starting-conversations',
+        situationsFrom([
+          { title: 'Breaking the Ice', id: 'breaking-the-ice' },
+          { title: 'Asking First Question', id: 'asking-first-question' },
+          { title: 'Finding Common Topics', id: 'finding-common-topics' },
+          { title: 'Starting with Compliments', id: 'starting-with-compliments' },
+          { title: 'Joining a Conversation', id: 'joining-a-conversation' },
+        ])
+      ),
+      topic(
+        'Basic Questions',
+        'basic-questions',
+        situationsFrom([
+          { title: 'Yes/No Questions', id: 'yes-no-questions' },
+          { title: 'WH Questions', id: 'wh-questions' },
+          { title: 'Personal Questions', id: 'personal-questions' },
+          { title: 'Information Questions', id: 'information-questions' },
+          { title: 'Choice Questions', id: 'choice-questions' },
+        ])
+      ),
+      topic(
+        'Giving Answers',
+        'giving-answers',
+        situationsFrom([
+          { title: 'Short Answers', id: 'short-answers' },
+          { title: 'Detailed Answers', id: 'detailed-answers' },
+          { title: 'Personal Answers', id: 'personal-answers' },
+          { title: 'Professional Answers', id: 'professional-answers' },
+          { title: 'Opinion Answers', id: 'opinion-answers' },
+        ])
+      ),
     ],
   },
   {
-    id: 'outside',
-    title: 'Outside / Daily Life',
+    id: 'level-2',
+    title: 'Level 2: Talking About Yourself',
     topics: [
-      topic(21, 'Ordering Food', 'ordering-food'),
-      topic(22, 'Tea Stall Conversation', 'tea-stall'),
-      topic(23, 'Coffee Shop Conversation', 'coffee-shop'),
-      topic(24, 'Shopping Conversation', 'shopping'),
-      topic(25, 'Asking Price', 'asking-price'),
-      topic(26, 'Bargaining', 'bargaining'),
-      topic(27, 'Grocery Store Conversation', 'grocery-store'),
-      topic(28, 'Ordering Online', 'ordering-online'),
-      topic(29, 'Returning a Product', 'returning-product'),
-      topic(30, 'Talking to Delivery Boy', 'delivery-boy'),
-      topic(31, 'Cab / Auto Conversation', 'cab-auto'),
-      topic(32, 'Bus & Metro Conversation', 'bus-metro'),
-      topic(33, 'Asking Directions', 'asking-directions'),
-      topic(34, 'Hotel Conversation', 'hotel'),
-      topic(35, 'Airport Conversation', 'airport'),
-      topic(36, 'Train Journey Conversation', 'train-journey'),
+      topic(
+        'Talking About Yourself',
+        'talking-about-yourself',
+        situationsFrom([
+          { title: 'Personal Life', id: 'personal-life' },
+          { title: 'Family', id: 'family' },
+          { title: 'Hobbies', id: 'hobbies' },
+          { title: 'Goals', id: 'goals' },
+          { title: 'Personality', id: 'personality' },
+        ])
+      ),
+      topic(
+        'Daily Life',
+        'daily-life',
+        situationsFrom([
+          { title: 'Daily Routine', id: 'daily-routine' },
+          { title: 'Weekend Activities', id: 'weekend-activities' },
+          { title: 'Studies', id: 'studies' },
+          { title: 'Work Life', id: 'work-life' },
+          { title: 'Free Time', id: 'free-time' },
+        ])
+      ),
+      topic(
+        'Describing Things',
+        'describing-things',
+        situationsFrom([
+          { title: 'People', id: 'people' },
+          { title: 'Places', id: 'places' },
+          { title: 'Objects', id: 'objects' },
+          { title: 'Events', id: 'events' },
+          { title: 'Experiences', id: 'experiences' },
+        ])
+      ),
+      topic(
+        'Talking About Preferences',
+        'talking-about-preferences',
+        situationsFrom([
+          { title: 'Favorite Food', id: 'favorite-food' },
+          { title: 'Favorite Movies', id: 'favorite-movies' },
+          { title: 'Favorite Sports', id: 'favorite-sports' },
+          { title: 'Favorite Places', id: 'favorite-places' },
+          { title: 'Favorite Activities', id: 'favorite-activities' },
+        ])
+      ),
+      topic(
+        'Storytelling',
+        'storytelling',
+        situationsFrom([
+          { title: 'Childhood Memories', id: 'childhood-memories' },
+          { title: 'Travel Stories', id: 'travel-stories' },
+          { title: 'Funny Incidents', id: 'funny-incidents' },
+          { title: 'Learning Experiences', id: 'learning-experiences' },
+          { title: 'Work Experiences', id: 'work-experiences' },
+        ])
+      ),
     ],
   },
   {
-    id: 'work',
-    title: 'Work / Office',
+    id: 'level-3',
+    title: 'Level 3: Social Conversations',
     topics: [
-      topic(37, 'First Day at Office', 'first-day-office'),
-      topic(38, 'Office Small Talk', 'office-small-talk'),
-      topic(39, 'Talking to Manager', 'talking-manager'),
-      topic(40, 'Talking to Colleague', 'talking-colleague'),
-      topic(41, 'Standup Meeting', 'standup-meeting'),
-      topic(42, 'Client Call', 'client-call'),
-      topic(43, 'Asking for Leave', 'asking-leave'),
-      topic(44, 'Deadline Discussion', 'deadline-discussion'),
-      topic(45, 'Explaining a Problem', 'explaining-problem'),
-      topic(46, 'Giving Updates', 'giving-updates'),
-      topic(47, 'Asking Doubts', 'asking-doubts'),
-      topic(48, 'Presentation Conversation', 'presentation'),
-      topic(49, 'Interview Introduction', 'interview-intro'),
-      topic(50, 'HR Interview', 'hr-interview'),
-      topic(51, 'Technical Interview', 'technical-interview'),
-      topic(52, 'Salary Discussion', 'salary-discussion'),
+      topic(
+        'Thanking',
+        'thanking',
+        situationsFrom([
+          { title: 'Casual Thanks', id: 'casual-thanks' },
+          { title: 'Formal Thanks', id: 'formal-thanks' },
+          { title: 'Professional Thanks', id: 'professional-thanks' },
+          { title: 'Appreciating Help', id: 'appreciating-help' },
+        ])
+      ),
+      topic(
+        'Apologizing',
+        'apologizing',
+        situationsFrom([
+          { title: 'Small Mistakes', id: 'small-mistakes' },
+          { title: 'Serious Mistakes', id: 'serious-mistakes' },
+          { title: 'Workplace Apologies', id: 'workplace-apologies' },
+          { title: 'Personal Apologies', id: 'personal-apologies' },
+        ])
+      ),
+      topic(
+        'Compliments',
+        'compliments',
+        situationsFrom([
+          { title: 'Appearance', id: 'appearance' },
+          { title: 'Skills', id: 'skills' },
+          { title: 'Work', id: 'work' },
+          { title: 'Personality', id: 'personality' },
+        ])
+      ),
+      topic(
+        'Invitations',
+        'invitations',
+        situationsFrom([
+          { title: 'Inviting Someone', id: 'inviting-someone' },
+          { title: 'Accepting Invitations', id: 'accepting-invitations' },
+          { title: 'Declining Invitations', id: 'declining-invitations' },
+          { title: 'Rescheduling Plans', id: 'rescheduling-plans' },
+        ])
+      ),
+      topic(
+        'Congratulations',
+        'congratulations',
+        situationsFrom([
+          { title: 'Birthday', id: 'birthday' },
+          { title: 'Achievement', id: 'achievement' },
+          { title: 'Promotion', id: 'promotion' },
+          { title: 'Festivals', id: 'festivals' },
+        ])
+      ),
     ],
   },
   {
-    id: 'college',
-    title: 'College / Student Life',
+    id: 'level-4',
+    title: 'Level 4: Discussions',
     topics: [
-      topic(53, 'College Conversation', 'college-conversation'),
-      topic(54, 'Talking in Class', 'talking-in-class'),
-      topic(55, 'Group Discussion', 'group-discussion'),
-      topic(56, 'Asking Teacher', 'asking-teacher'),
-      topic(57, 'Talking to Classmates', 'talking-classmates'),
-      topic(58, 'Hostel / PG Conversation', 'hostel-pg'),
-      topic(59, 'Roommate Conversation', 'roommate'),
+      topic(
+        'Giving Opinions',
+        'giving-opinions',
+        situationsFrom([
+          { title: 'Movies', id: 'movies' },
+          { title: 'Sports', id: 'sports' },
+          { title: 'Technology', id: 'technology' },
+          { title: 'Education', id: 'education' },
+          { title: 'Social Media', id: 'social-media' },
+        ])
+      ),
+      topic(
+        'Agreeing',
+        'agreeing',
+        situationsFrom([
+          { title: 'Strong Agreement', id: 'strong-agreement' },
+          { title: 'Partial Agreement', id: 'partial-agreement' },
+          { title: 'Friendly Agreement', id: 'friendly-agreement' },
+          { title: 'Professional Agreement', id: 'professional-agreement' },
+        ])
+      ),
+      topic(
+        'Disagreeing',
+        'disagreeing',
+        situationsFrom([
+          { title: 'Soft Disagreement', id: 'soft-disagreement' },
+          { title: 'Strong Disagreement', id: 'strong-disagreement' },
+          { title: 'Professional Disagreement', id: 'professional-disagreement' },
+          { title: 'Debate Situations', id: 'debate-situations' },
+        ])
+      ),
+      topic(
+        'Comparing',
+        'comparing',
+        situationsFrom([
+          { title: 'Products', id: 'products' },
+          { title: 'Cities', id: 'cities' },
+          { title: 'Jobs', id: 'jobs' },
+          { title: 'Education Options', id: 'education-options' },
+          { title: 'Travel Destinations', id: 'travel-destinations' },
+        ])
+      ),
+      topic(
+        'Giving Reasons',
+        'giving-reasons',
+        situationsFrom([
+          { title: 'Supporting Opinions', id: 'supporting-opinions' },
+          { title: 'Explaining Choices', id: 'explaining-choices' },
+          { title: 'Justifying Decisions', id: 'justifying-decisions' },
+          { title: 'Cause & Effect', id: 'cause-and-effect' },
+          { title: 'Persuading Others', id: 'persuading-others' },
+        ])
+      ),
     ],
   },
   {
-    id: 'emergency',
-    title: 'Emergency / Important Moments',
+    id: 'level-5',
+    title: 'Level 5: Fluent Conversations',
     topics: [
-      topic(60, 'Doctor Conversation', 'doctor'),
-      topic(61, 'Pharmacy Conversation', 'pharmacy'),
-      topic(62, 'Emergency Situation', 'emergency'),
-      topic(63, 'Talking to Police', 'police'),
-      topic(64, 'Banking Conversation', 'banking'),
-      topic(65, 'UPI & Payment Issues', 'upi-payment'),
-      topic(66, 'Customer Support Call', 'customer-support'),
-      topic(67, 'Internet / Mobile Problem', 'internet-mobile'),
+      topic(
+        'Follow-up Questions',
+        'follow-up-questions',
+        situationsFrom([
+          { title: 'Asking More Details', id: 'asking-more-details' },
+          { title: 'Showing Interest', id: 'showing-interest' },
+          { title: 'Exploring Experiences', id: 'exploring-experiences' },
+          { title: 'Continuing Topics', id: 'continuing-topics' },
+        ])
+      ),
+      topic(
+        'Continuing Conversations',
+        'continuing-conversations',
+        situationsFrom([
+          { title: 'Sharing Experiences', id: 'sharing-experiences' },
+          { title: 'Giving Examples', id: 'giving-examples' },
+          { title: 'Expanding Answers', id: 'expanding-answers' },
+          { title: 'Keeping Topic Alive', id: 'keeping-topic-alive' },
+        ])
+      ),
+      topic(
+        'Handling Difficult Moments',
+        'handling-difficult-moments',
+        situationsFrom([
+          { title: 'Asking to Repeat', id: 'asking-to-repeat' },
+          { title: 'Asking to Explain', id: 'asking-to-explain' },
+          {
+            title: 'Saying "I Don\'t Understand"',
+            id: 'saying-i-dont-understand',
+          },
+          { title: 'Correcting Yourself', id: 'correcting-yourself' },
+        ])
+      ),
+      topic(
+        'Speaking Naturally',
+        'speaking-naturally',
+        situationsFrom([
+          { title: 'Avoiding One-word Answers', id: 'avoiding-one-word-answers' },
+          { title: 'Using Connectors', id: 'using-connectors' },
+          { title: 'Speaking Longer Sentences', id: 'speaking-longer-sentences' },
+          { title: 'Giving Examples', id: 'giving-examples-natural' },
+        ])
+      ),
+      topic(
+        'Expressing Feelings',
+        'expressing-feelings',
+        situationsFrom([
+          { title: 'Happiness', id: 'happiness' },
+          { title: 'Excitement', id: 'excitement' },
+          { title: 'Nervousness', id: 'nervousness' },
+          { title: 'Disappointment', id: 'disappointment' },
+          { title: 'Frustration', id: 'frustration' },
+        ])
+      ),
     ],
   },
   {
-    id: 'social',
-    title: 'Social / Confidence',
+    id: 'level-6',
+    title: 'Level 6: Real-Life English',
     topics: [
-      topic(68, 'Party Conversation', 'party'),
-      topic(69, 'Wedding / Family Function', 'wedding-function'),
-      topic(70, 'Talking in Public', 'talking-public'),
-      topic(71, 'Introducing Friends', 'introducing-friends'),
-      topic(72, 'Talking About Hobbies', 'hobbies'),
-      topic(73, 'Cricket & Sports Talk', 'cricket-sports'),
-      topic(74, 'Movies & Music Conversation', 'movies-music'),
-      topic(75, 'Social Media Conversation', 'social-media'),
-      topic(76, 'Talking Under Pressure', 'under-pressure'),
-      topic(77, 'Angry Conversation', 'angry-conversation'),
-      topic(78, 'Handling Awkward Silence', 'awkward-silence'),
+      topic(
+        'Ordering Food',
+        'ordering-food',
+        situationsFrom([
+          { title: 'At a Restaurant', id: 'at-restaurant' },
+          { title: 'Food Delivery', id: 'food-delivery' },
+          { title: 'Customizing Your Order', id: 'customizing-order' },
+          { title: 'Paying the Bill', id: 'paying-bill' },
+        ])
+      ),
+      topic(
+        'Shopping',
+        'shopping',
+        situationsFrom([
+          { title: 'Asking the Price', id: 'asking-price' },
+          { title: 'Trying Clothes', id: 'trying-clothes' },
+          { title: 'Return or Exchange', id: 'return-exchange' },
+          { title: 'Asking for a Discount', id: 'asking-discount' },
+        ])
+      ),
+      topic(
+        'Travel',
+        'travel',
+        situationsFrom([
+          { title: 'Airport Check-in', id: 'airport-check-in' },
+          { title: 'Hotel Check-in', id: 'hotel-check-in' },
+          { title: 'Asking Directions', id: 'asking-directions' },
+          { title: 'Train or Bus Ticket', id: 'train-bus-ticket' },
+        ])
+      ),
+      topic(
+        'Phone Calls',
+        'phone-calls',
+        situationsFrom([
+          { title: 'Booking an Appointment', id: 'booking-appointment' },
+          { title: 'Wrong Number', id: 'wrong-number' },
+          { title: 'Leaving a Message', id: 'leaving-message' },
+          { title: 'Calling Customer Care', id: 'calling-customer-care' },
+        ])
+      ),
+      topic(
+        'Doctor Visits',
+        'doctor-visits',
+        situationsFrom([
+          { title: 'Describing Symptoms', id: 'describing-symptoms' },
+          { title: 'At the Pharmacy', id: 'at-pharmacy' },
+          { title: 'Follow-up Questions', id: 'follow-up-questions' },
+          { title: 'Medical Reports', id: 'medical-reports' },
+        ])
+      ),
+      topic(
+        'Banking',
+        'banking',
+        situationsFrom([
+          { title: 'Opening an Account', id: 'opening-account' },
+          { title: 'ATM Problem', id: 'atm-problem' },
+          { title: 'Money Transfer', id: 'money-transfer' },
+          { title: 'Loan Inquiry', id: 'loan-inquiry' },
+        ])
+      ),
+      topic(
+        'Customer Support',
+        'customer-support',
+        situationsFrom([
+          { title: 'Product Not Working', id: 'product-not-working' },
+          { title: 'Refund Request', id: 'refund-request' },
+          { title: 'Late Delivery', id: 'late-delivery' },
+          { title: 'Wrong Bill Charge', id: 'wrong-bill-charge' },
+        ])
+      ),
+      topic(
+        'Emergencies',
+        'emergencies',
+        situationsFrom([
+          { title: 'Calling an Ambulance', id: 'calling-ambulance' },
+          { title: 'Reporting to Police', id: 'reporting-police' },
+          { title: 'Lost Wallet or Phone', id: 'lost-wallet-phone' },
+          { title: 'Road Accident Help', id: 'road-accident-help' },
+        ])
+      ),
     ],
   },
   {
-    id: 'indian-daily',
-    title: 'Indian Daily Life',
+    id: 'level-7',
+    title: 'Level 7: Workplace English',
     topics: [
-      topic(79, 'Asking for Recharge', 'recharge'),
-      topic(80, 'Talking About Traffic', 'traffic'),
-      topic(81, 'Talking About Weather', 'weather'),
-      topic(82, 'Talking About Money', 'money'),
-      topic(83, 'Talking About Salary', 'salary-daily'),
-      topic(84, 'Asking for Notes', 'asking-notes'),
-      topic(85, 'Asking for WiFi Password', 'wifi-password'),
-      topic(86, 'Asking Someone to Repeat', 'ask-repeat'),
-      topic(87, 'Talking to Neighbors', 'neighbors'),
-      topic(88, 'Talking to Maid / Worker', 'maid-worker'),
-      topic(89, 'Food Delivery Call', 'food-delivery-call'),
-      topic(90, 'Talking During Festival', 'festival'),
+      topic(
+        'Office Introduction',
+        'office-introduction',
+        situationsFrom([
+          { title: 'Meeting the Team', id: 'meeting-the-team' },
+          { title: 'Introducing Yourself', id: 'introducing-yourself' },
+          { title: 'First Day with HR', id: 'first-day-hr' },
+          { title: 'Quick Desk Intro', id: 'quick-desk-intro' },
+        ])
+      ),
+      topic(
+        'Office Small Talk',
+        'office-small-talk',
+        situationsFrom([
+          { title: 'Monday Morning', id: 'monday-morning' },
+          { title: 'Coffee Break', id: 'coffee-break' },
+          { title: 'Weekend Plans', id: 'weekend-plans' },
+          { title: 'Lunch Conversation', id: 'lunch-conversation' },
+        ])
+      ),
+      topic(
+        'Meetings',
+        'meetings',
+        situationsFrom([
+          { title: 'Joining a Meeting', id: 'joining-meeting' },
+          { title: 'Sharing Your View', id: 'sharing-your-view' },
+          { title: 'Asking for Clarification', id: 'asking-clarification' },
+          { title: 'Wrapping Up', id: 'wrapping-up' },
+        ])
+      ),
+      topic(
+        'Giving Updates',
+        'giving-updates',
+        situationsFrom([
+          { title: 'Daily Standup', id: 'daily-standup' },
+          { title: 'Weekly Status', id: 'weekly-status' },
+          { title: 'Delay Update', id: 'delay-update' },
+          { title: 'Sharing Good News', id: 'sharing-good-news' },
+        ])
+      ),
+      topic(
+        'Explaining Problems',
+        'explaining-problems',
+        situationsFrom([
+          { title: 'Reporting a Bug', id: 'reporting-bug' },
+          { title: 'Missed Deadline', id: 'missed-deadline' },
+          { title: 'Blocked by Dependency', id: 'blocked-dependency' },
+          { title: 'Escalating an Issue', id: 'escalating-issue' },
+        ])
+      ),
+      topic(
+        'Client Communication',
+        'client-communication',
+        situationsFrom([
+          { title: 'Kickoff Call', id: 'kickoff-call' },
+          { title: 'Handling a Complaint', id: 'handling-complaint' },
+          { title: 'Product Demo', id: 'product-demo' },
+          { title: 'Follow-up Check-in', id: 'follow-up-check-in' },
+        ])
+      ),
+      topic(
+        'Presentations',
+        'presentations',
+        situationsFrom([
+          { title: 'Opening Your Talk', id: 'opening-talk' },
+          { title: 'Explaining a Slide', id: 'explaining-slide' },
+          { title: 'Q and A', id: 'handling-qa' },
+          { title: 'Closing Thanks', id: 'closing-thanks' },
+        ])
+      ),
+    ],
+  },
+  {
+    id: 'level-8',
+    title: 'Level 8: Interview English',
+    topics: [
+      topic(
+        'Tell Me About Yourself',
+        'tell-me-about-yourself',
+        situationsFrom([
+          { title: 'Opening Introduction', id: 'opening-intro' },
+          { title: 'Career Switch Story', id: 'career-switch-story' },
+          { title: 'Fresher Introduction', id: 'fresher-intro' },
+          { title: 'Thirty Second Pitch', id: 'thirty-second-pitch' },
+        ])
+      ),
+      topic(
+        'Educational Background',
+        'educational-background',
+        situationsFrom([
+          { title: 'College and Degree', id: 'college-degree' },
+          { title: 'Grades and Subjects', id: 'grades-subjects' },
+          { title: 'Gap Year Explanation', id: 'gap-year' },
+          { title: 'Certifications', id: 'certifications' },
+        ])
+      ),
+      topic(
+        'Work Experience',
+        'work-experience',
+        situationsFrom([
+          { title: 'Current Role', id: 'current-role' },
+          { title: 'Previous Company', id: 'previous-company' },
+          { title: 'Internship Experience', id: 'internship-experience' },
+          { title: 'Why Leaving Job', id: 'why-leaving-job' },
+        ])
+      ),
+      topic(
+        'Project Discussion',
+        'project-discussion',
+        situationsFrom([
+          { title: 'Explaining a Project', id: 'explaining-project' },
+          { title: 'Technical Challenges', id: 'technical-challenges' },
+          { title: 'Your Contribution', id: 'your-contribution' },
+          { title: 'Project Results', id: 'project-results' },
+        ])
+      ),
+      topic(
+        'Strengths & Weaknesses',
+        'strengths-weaknesses',
+        situationsFrom([
+          { title: 'Key Strengths', id: 'key-strengths' },
+          { title: 'Weakness with Improvement', id: 'weakness-improvement' },
+          { title: 'Team Fit', id: 'team-fit' },
+          { title: 'Learning Ability', id: 'learning-ability' },
+        ])
+      ),
+      topic(
+        'Behavioral Questions',
+        'behavioral-questions',
+        situationsFrom([
+          { title: 'Conflict at Work', id: 'conflict-at-work' },
+          { title: 'Failure Story', id: 'failure-story' },
+          { title: 'Leadership Example', id: 'leadership-example' },
+          { title: 'Handled Pressure', id: 'handled-pressure' },
+        ])
+      ),
+      topic(
+        'Salary Discussion',
+        'salary-discussion',
+        situationsFrom([
+          { title: 'Expected CTC', id: 'expected-ctc' },
+          { title: 'Current Salary', id: 'current-salary' },
+          { title: 'Negotiating Offer', id: 'negotiating-offer' },
+          { title: 'Benefits and Bonus', id: 'benefits-bonus' },
+        ])
+      ),
     ],
   },
 ];

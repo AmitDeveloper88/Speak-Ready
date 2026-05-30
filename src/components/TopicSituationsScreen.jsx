@@ -64,7 +64,7 @@ export default function TopicSituationsScreen({
             Is topic ke situations jald aa rahe hain.
           </p>
           <p className="mt-2 text-xs text-white/45">
-            Pehle “Meeting Someone First Time” complete kar rahe hain.
+            Pehle Level 1 — Greetings se shuru kar rahe hain.
           </p>
         </div>
       )}
